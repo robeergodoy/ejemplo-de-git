@@ -1,27 +1,19 @@
-const inquirer = require('inquirer');
-
-const fs = require('fs')
-
-const rutaArchivo = __dirname + '/pedidos.json'
-
-let pedidos = fs.readFileSync(rutaArchivo, { enconding: 'utf8' });
-
-pedidos = JSON.parse(pedidos)
-
+const inquirer = require('inquirer')
+​
 let opciones = [
 
     {
         name: 'nombre',
         type: 'input',
         message: 'Ingresa tu nombre',
-    },
+},
 
 
     {
         name: 'telefono',
         type: 'input',
         message: 'Ingresa tu numero de telefono',
-    },
+},
 
 
     {
@@ -29,7 +21,7 @@ let opciones = [
         type: 'rawlist',
         message: 'Elegi el gusto de la pizza',
         choices: ['Muzzarella', 'Jamon y Morron', 'Calabresa', '4 Quesos'],
-    },
+},
 
 
     {
@@ -37,14 +29,14 @@ let opciones = [
         type: 'list',
         message: 'Elegi el tamaño de la pizza',
         choices: ['Individual', 'Mediana', 'Grande'],
-    },
+},
 
 
     {
         name: 'con_bebida',
         type: 'confirm',
         default: false
-    },
+},
 
 
     {
@@ -55,7 +47,7 @@ let opciones = [
         when: function (respuesta) {
             return respuesta.con_bebida
         }
-    },
+},
 
 
     {
@@ -63,7 +55,7 @@ let opciones = [
         type: 'checkbox',
         message: 'Elegi los gustos de las empanadas',
         choices: ['Jamon y Queso', 'Cebolla y Queso', 'Caprese', 'Roquefort', 'Verdura', 'Humita'],
-    },
+},
 
 
     {
@@ -71,7 +63,7 @@ let opciones = [
         type: 'confirm',
         message: 'La pizza es para llevar ?',
         default: false
-    },
+},
 
 
     {
@@ -88,15 +80,15 @@ let opciones = [
             }
             return true
         }
-    },
+},
 
 
     {
         name: 'cliente_habitual',
         type: 'confirm',
         default: false
-    }]
-
+}]
+​
 
 let listaDeDescuentos = function () {
     return {
@@ -106,7 +98,7 @@ let listaDeDescuentos = function () {
     }
 }
 
-
+​
 let obtenerPrecioPizza = function (tamanio) {
     let precios = {
         'Individual': 430,
@@ -116,7 +108,7 @@ let obtenerPrecioPizza = function (tamanio) {
     return precios[tamanio]
 }
 
-
+​
 let obtenerDescuento = (tamanio, conBebida, fnLista) => {
     if (!conBebida) {
         return 0
@@ -125,16 +117,16 @@ let obtenerDescuento = (tamanio, conBebida, fnLista) => {
     return descuentos[tamanio]
 }
 
-
+​
 inquirer.prompt(opciones)
     .then(function (respuestas) {
 
         console.log(respuestas);
-        console.log('=== Resumen de tu pedido ===');
+        console.log('=== Resumen de tu pedido ==='); 
         console.log('Tus datos son - Nombre: ' + respuestas.nombre + ' / Teléfono: ' + respuestas.telefono);
-
+        
         let precioDelivery = 0;
-
+        
         if (respuestas.para_llevar) {
             precioDelivery = 20;
 
@@ -143,81 +135,44 @@ inquirer.prompt(opciones)
 
             console.log('Nos indicaste que pasarás a retirar tu pedido');
         }
-
-        console.log('=== Productos solicitados ===');
-        console.log('Pizza: ' + respuestas.gusto);
-        console.log('Tamaño: ' + respuestas.tamanio);
-
+        
+         console.log('=== Productos solicitados ===');
+         console.log('Pizza: ' + respuestas.gusto); 
+         console.log('Tamaño: ' + respuestas.tamanio);
+        
 
         let precioBebida = 0
-
+        
         if (respuestas.con_bebida) {
-            precioBebida = 80
+            precioBebida = 80 
             console.log('Bebida: ' + respuestas.bebida);
         }
-
+        
         if (respuestas.cliente_habitual) {
-            console.log('Tus tres empanadas de regalo serán de:');
+            console.log('Tus tres empanadas de regalo serán de:'); 
             console.log('Jamon y Queso');
-            console.log('Cebolla y Queso');
+            console.log('Cebolla y Queso'); 
             console.log('Muzarella');
         }
-
+        
         let precioPizza = obtenerPrecioPizza(respuestas.tamanio);
-
+        
         let descuento = obtenerDescuento(respuestas.tamanio, respuestas.con_bebida, listaDeDescuentos)
-
+        
         console.log('El descuento es de ' + descuento + '%');
-
+        
         console.log('Total delivery: ' + precioDelivery);
-
+        
         let subtotal = precioPizza + precioBebida
-
+        
         let descuentoFinal = (subtotal * descuento) / 100
 
-
+        
         console.log('Subtotal: ' + subtotal);
-
+        
         console.log('Descuento: ' + descuentoFinal);
-
+        
         console.log('Total: ' + (subtotal - descuentoFinal + precioDelivery));
 
-
-
-
-        let fechaDelPedido = new Date
-
-        let nuevos = {
-            fecha: fechaDelPedido.toLocaleDateString('en-US', {'hour12': true}),
-            hora: fechaDelPedido.toLocaleDateString('en-US', {'hour12': true}),
-
-        }
-
-        let final = {
-            ...respuestas,
-            ...nuevos,
-            totalProductos: subtotal,
-            descuento: descuentoFinal,
-            id: pedidos.length == 0 ? 1 : pedidos.length++
-        }
-
-        pedidos.push(final)
-       
-        pedidos = JSON.stringify(pedidos)
-
-        fs.writeFileSync(rutaArchivo, pedidos)
-
-
-
+        
     })
-
-
-
-
-
-
-
-
-
-
-
